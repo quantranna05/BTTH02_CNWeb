@@ -43,5 +43,41 @@ class EnrollmentController
             }
         }
     }
+    // Thêm vào class EnrollmentController
+
+    public function completeLesson()
+    {
+        // 1. Kiểm tra đăng nhập
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /BTTH02_CNWeb/onlinecourse/auth/login");
+            exit();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $studentId = $_SESSION['user_id'];
+            $courseId = $_POST['course_id'];
+
+            // Đếm tổng số bài học của khóa này để chia %
+            // (Lưu ý: Đoạn này cần gọi Model Lesson để đếm, mình viết gọn SQL ở đây hoặc bạn gọi LessonModel)
+            $db = new Database();
+            $conn = $db->getConnection();
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM lessons WHERE course_id = :course_id");
+            $stmt->bindParam(':course_id', $courseId);
+            $stmt->execute();
+            $totalLessons = $stmt->fetchColumn();
+
+            if ($totalLessons > 0) {
+                // Tính giá trị % của 1 bài học
+                $percentPerLesson = 100 / $totalLessons;
+
+                // Gọi Model để cộng %
+                $enrollmentModel = new Enrollment();
+                $enrollmentModel->updateProgress($studentId, $courseId, $percentPerLesson);
+            }
+
+            // Quay lại trang chi tiết
+            header("Location: /BTTH02_CNWeb/onlinecourse/courses/detail/" . $courseId);
+        }
+    }
 }
 ?>
