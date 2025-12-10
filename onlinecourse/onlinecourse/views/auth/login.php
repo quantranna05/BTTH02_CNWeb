@@ -1,25 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-
-<h2>Đăng nhập</h2>
-
-<?php if (!empty($error)) echo "<p style='color:red'>$error</p>"; ?>
-
-<form method="POST" action="index.php?page=login_submit">
-    <label>Username:</label><br>
-    <input type="text" name="username"><br><br>
-
-    <label>Password:</label><br>
-    <input type="password" name="password"><br><br>
-
-    <button type="submit">Login</button>
-</form>
-
-<p>Chưa có tài khoản? <a href="index.php?page=register">Đăng ký</a></p>
-
+<div class="container">
+    <div class="auth-box">
+        <h2>Đăng nhập</h2>
+        <?php if(isset($error)) echo "<p class='error'>$error</p>"; ?>
+        <form method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Mật khẩu" required>
+            <button type="submit">Đăng nhập</button>
+        </form>
+        <p>Chưa có tài khoản? <a href="index.php?page=register">Đăng ký ngay</a></p>
+    </div>
+</div>
+<script src="assets/js/script.js"></script>
 </body>
 </html>
