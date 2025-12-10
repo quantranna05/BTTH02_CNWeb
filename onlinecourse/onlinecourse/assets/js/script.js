@@ -1,13 +1,24 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const forms = document.querySelectorAll('form');
-
-    forms.forEach(form => {
-        form.addEventListener('submit', e => {
-            const password = form.querySelector('input[name="password"]').value;
-            if (password.length < 6) {
-                e.preventDefault();
-                alert("Mật khẩu phải từ 6 ký tự trở lên!");
+// Hiển thị / ẩn mật khẩu
+document.addEventListener('DOMContentLoaded', function () {
+    const toggleBtns = document.querySelectorAll('.show-password');
+    toggleBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const input = this.previousElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.textContent = 'Ẩn mật khẩu';
+            } else {
+                input.type = 'password';
+                this.textContent = 'Hiện mật khẩu';
             }
         });
+    });
+
+    // Ẩn thông báo sau 5s
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(a => {
+        setTimeout(() => {
+            a.style.display = 'none';
+        }, 5000);
     });
 });

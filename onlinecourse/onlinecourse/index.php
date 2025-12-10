@@ -1,40 +1,42 @@
 <?php
 session_start();
+require_once 'controllers/AuthController.php';
 
-require_once "controllers/AuthController.php";
+$page = $_GET['page'] ?? 'login';
 
-$controller = new AuthController();
+$auth = new AuthController();
 
-// Điều hướng theo ?page=
-$page = $_GET["page"] ?? "login";
-
-switch ($page) {
-
-    case "login":
-        $controller->showLogin();
+switch($page) {
+    case 'login':
+        $auth->login();
         break;
-
-    case "login_submit":
-        $controller->login();
+    case 'register':
+        $auth->register();
         break;
-
-    case "register":
-        $controller->showRegister();
+    case 'logout':
+        $auth->logout();
         break;
-
-    case "register_submit":
-        $controller->register();
+    case 'student_dashboard':
+        if(!isset($_SESSION['user']) || $_SESSION['user']['role'] != 0) {
+            header("Location: index.php?page=login");
+            exit;
+        }
+        require 'views/student/dashboard.php';
         break;
-
-    case "logout":
-        $controller->logout();
+    case 'instructor_dashboard':
+        if(!isset($_SESSION['user']) || $_SESSION['user']['role'] != 1) {
+            header("Location: index.php?page=login");
+            exit;
+        }
+        require 'views/instructor/dashboard.php';
         break;
-
-    case "dashboard":
-        echo "<h1>Xin chào, " . ($_SESSION["user"]["fullname"] ?? "Guest") . "</h1>";
-        echo "<a href='index.php?page=logout'>Logout</a>";
+    case 'admin_dashboard':
+        if(!isset($_SESSION['user']) || $_SESSION['user']['role'] != 2) {
+            header("Location: index.php?page=login");
+            exit;
+        }
+        require 'views/admin/dashboard.php';
         break;
-
     default:
-        echo "404 - Page not found";
+        echo "Trang không tồn tại!";
 }

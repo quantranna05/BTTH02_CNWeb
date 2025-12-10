@@ -1,27 +1,23 @@
 <?php
-
 class Database {
     private $host = "localhost";
-    private $dbname = "onlinecourse";
+    private $db_name = "onlinecourse";
     private $username = "root";
     private $password = "";
     public $conn;
 
-    public function connect() {
+    public function getConnection() {
+        $this->conn = null;
         try {
             $this->conn = new PDO(
-                "mysql:host=$this->host;dbname={$this->dbname};charset=utf8",
+                "mysql:host={$this->host};dbname={$this->db_name}",
                 $this->username,
                 $this->password
             );
-
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        } catch (PDOException $e) {
-            echo "Database connection failed: " . $e->getMessage();
-            exit;
+            $this->conn->exec("set names utf8");
+        } catch(PDOException $exception) {
+            echo "Kết nối lỗi: " . $exception->getMessage();
         }
-
         return $this->conn;
     }
 }

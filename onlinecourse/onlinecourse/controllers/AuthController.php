@@ -1,60 +1,58 @@
 <?php
-
-require_once "models/User.php";
+session_start();
+require_once 'models/User.php';
 
 class AuthController {
+    private $user;
 
-    // Hiển thị form login
-    public function showLogin() {
-        require "views/auth/login.php";
+    public function __construct() {
+        $this->user = new User();
     }
 
-    // Xử lý login
-    public function login() {
-        if (!empty($_POST["username"]) && !empty($_POST["password"])) {
+    public function register() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = $_POST['username'];
+            $email = $_POST['email'];
+            $fullname = $_POST['fullname'];
+            $password = $_POST['password'];
 
-            $userModel = new User();
-            $user = $userModel->login($_POST["username"], $_POST["password"]);
-
-            if ($user) {
-                session_start();
-                $_SESSION["user"] = $user;
-                header("Location: index.php?page=dashboard");
+            if($this->user->register($username, $email, $fullname, $password)) {
+                header("Location: index.php?page=login&success=1");
                 exit;
             } else {
-                $error = "Sai username hoặc password!";
-                require "views/auth/login.php";
+                $error = "Đăng ký thất bại, có thể email hoặc username đã tồn tại.";
             }
         }
+        require 'views/auth/register.php';
     }
 
-    // Hiển thị form register
-    public function showRegister() {
-        require "views/auth/register.php";
-    }
+    public function login() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = $_POST['email'];
+            $password = $_POST['password'];
 
-    // Xử lý register
-    public function register() {
-        if (!empty($_POST["username"]) && !empty($_POST["email"]) &&
-            !empty($_POST["password"]) && !empty($_POST["fullname"])) {
-
-            $userModel = new User();
-            $userModel->register(
-                $_POST["username"],
-                $_POST["email"],
-                $_POST["password"],
-                $_POST["fullname"]
-            );
-
-            header("Location: index.php?page=login&success=1");
-            exit;
+            $user = $this->user->login($email, $password);
+            if ($user) {
+                $_SESSION['user'] = $user;
+                // Redirect theo role
+                if ($user['role'] == 0) {
+                    header("Location: index.php?page=student_dashboard");
+                } elseif ($user['role'] == 1) {
+                    header("Location: index.php?page=instructor_dashboard");
+                } else {
+                    header("Location: index.php?page=admin_dashboard");
+                }
+                exit;
+            } else {
+                $error = "Email hoặc mật khẩu sai!";
+            }
         }
+        require 'views/auth/login.php';
     }
 
-    // Logout
     public function logout() {
-        session_start();
         session_destroy();
         header("Location: index.php?page=login");
+        exit;
     }
 }
