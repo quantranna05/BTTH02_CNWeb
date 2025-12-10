@@ -1,4 +1,5 @@
 <?php
+
 class Database
 {
     private $host = "localhost";
@@ -20,8 +21,9 @@ class Database
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $exception) {
             echo "Lỗi kết nối CSDL: " . $exception->getMessage();
+
+
         }
         return $this->conn;
     }
 }
-?>
