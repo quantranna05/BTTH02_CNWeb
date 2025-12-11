@@ -4,22 +4,10 @@
 // 1. KHỞI ĐỘNG SESSION
 session_start();
 
-// =================================================================
-// --- [MỚI] CHẾ ĐỘ DEV (DÀNH CHO LẬP TRÌNH VIÊN C) ---
-// Giả lập người dùng ID=1 đã đăng nhập để test chức năng Đăng ký
-// LƯU Ý: XÓA ĐOẠN NÀY KHI GHÉP CODE VỚI LẬP TRÌNH VIÊN A
-// =================================================================
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1;       // Giả sử User ID 1 đang online
-    $_SESSION['username'] = 'Test Student';
-    $_SESSION['role'] = 0;          // 0 là học viên
-}
-// =================================================================
-
 // 2. ĐỊNH NGHĨA ĐƯỜNG DẪN GỐC
 define('ROOT_PATH', __DIR__);
 
-// 3. AUTOLOAD
+// 3. AUTOLOAD (Hệ thống nạp file tự động của C)
 spl_autoload_register(function ($className) {
     $paths = [
         ROOT_PATH . '/config/',
@@ -36,23 +24,39 @@ spl_autoload_register(function ($className) {
     }
 });
 
-// 4. XỬ LÝ ROUTING
+// 4. XỬ LÝ ROUTING (Hệ thống điều hướng thông minh của C)
 
+// Lấy tham số url
 $url = isset($_GET['url']) ? $_GET['url'] : 'home/index';
+
+// --- CẦU NỐI GIỮ LẠI TÍNH NĂNG CỦA A ---
+// Đoạn này giúp link cũ ?page=login của A vẫn chạy tốt trên hệ thống mới
+if (isset($_GET['page'])) {
+    $page = $_GET['page'];
+    if ($page == 'login')
+        $url = 'auth/login';
+    elseif ($page == 'register')
+        $url = 'auth/register';
+    elseif ($page == 'logout')
+        $url = 'auth/logout';
+}
+// ----------------------------------------
+
 $url = filter_var(rtrim($url, '/'), FILTER_SANITIZE_URL);
 $urlArr = explode('/', $url);
 
-// --- CẤU HÌNH ĐƯỜNG DẪN ĐẸP (ROUTING MAP) ---
+// --- BẢN ĐỒ ĐỊNH TUYẾN (Nơi A và C gặp nhau) ---
 $routingMap = [
+    // Các chức năng của C
     'courses' => 'CourseController',
     'khoa-hoc' => 'CourseController',
-    'login' => 'AuthController',
-    'register' => 'AuthController',
-
-
-    // --- [MỚI] THÊM DÒNG NÀY ĐỂ NÚT ĐĂNG KÝ CHẠY ĐƯỢC ---
     'enrollment' => 'EnrollmentController',
-    // ----------------------------------------------------
+    'progress' => 'ProgressController',
+
+    // Các chức năng của A (Đã được khai báo vào hệ thống mới)
+    'auth' => 'AuthController',
+    'login' => 'AuthController',    // gõ /login -> Gọi AuthController
+    'register' => 'AuthController',    // gõ /register -> Gọi AuthController
 ];
 
 // Xác định Controller
@@ -64,13 +68,16 @@ if (array_key_exists($routeKey, $routingMap)) {
     $controllerName = ucfirst($routeKey) . 'Controller';
 }
 
-// Xác định Action
+// Xác định Action (Hàm)
 $action = $urlArr[1] ?? 'index';
 
-// Xác định Tham số
-$params = array_slice($urlArr, 2);
+// Fix lỗi hành động mặc định cho Auth
+if ($routeKey == 'login')
+    $action = 'login';
+if ($routeKey == 'register')
+    $action = 'register';
 
-// 5. GỌI CONTROLLER VÀ CHẠY
+// 5. CHẠY CODE
 $controllerPath = ROOT_PATH . '/controllers/' . $controllerName . '.php';
 
 if (file_exists($controllerPath)) {
@@ -78,14 +85,23 @@ if (file_exists($controllerPath)) {
         $controllerObject = new $controllerName();
 
         if (method_exists($controllerObject, $action)) {
-            call_user_func_array([$controllerObject, $action], $params);
+            // Chạy hàm tương ứng
+            call_user_func_array([$controllerObject, $action], array_slice($urlArr, 2));
         } else {
-            die("Lỗi 404: Action '{$action}' không tồn tại trong Controller '{$controllerName}'.");
+            // Nếu gọi Auth mà không có hàm, mặc định về login
+            if ($controllerName == 'AuthController') {
+                $controllerObject->login();
+            } else {
+                die("Lỗi 404: Không tìm thấy chức năng.");
+            }
         }
     } else {
-        die("Lỗi hệ thống: Class '{$controllerName}' không được tìm thấy.");
+        die("Lỗi hệ thống: Không tìm thấy Controller.");
     }
 } else {
-    die("Lỗi 404: Trang bạn tìm kiếm không tồn tại (Controller '{$controllerName}' not found).");
+    die("Lỗi 404: Trang không tồn tại.");
 }
+
+// KHÔNG CẦN SWITCH-CASE CỦA A Ở DƯỚI NỮA
+// VÌ ĐOẠN CODE TRÊN ĐÃ BAO GỒM NÓ RỒI
 ?>

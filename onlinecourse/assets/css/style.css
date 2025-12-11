@@ -1,3 +1,4 @@
+
 /* GLOBAL STYLES */
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -48,7 +49,7 @@ nav a:hover {
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s, box-shadow 0.3s;
-  border: none !important; /* Ghi đè style inline cũ */
+  border: none !important; /* Ghi d� style inline cu */
 }
 
 .course-item:hover {
@@ -71,7 +72,7 @@ nav a:hover {
   font-weight: bold;
   margin-bottom: 10px;
   color: #2c3e50;
-  height: 54px; /* Giới hạn 2 dòng */
+  height: 54px; /* Gi?i h?n 2 d�ng */
   overflow: hidden;
 }
 
