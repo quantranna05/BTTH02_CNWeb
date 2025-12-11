@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Thay đổi dòng này cho đúng với thư mục máy bạn
+# Vì máy bạn nằm trong BTTH02_CNWeb/onlinecourse/ nên phải set Base
+RewriteBase /BTTH02_CNWeb/onlinecourse/
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
