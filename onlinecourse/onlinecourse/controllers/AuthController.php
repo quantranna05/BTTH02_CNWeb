@@ -42,43 +42,23 @@ class AuthController {
     public function login(){
         $error = '';
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (
+            $_SERVER['REQUEST_METHOD'] === 'POST'
+            && isset($_POST['username'], $_POST['password'])
+        ) {
             $username = trim($_POST['username']);
             $password = $_POST['password'];
 
             $user = $this->user->login($username, $password);
-
-            if (is_array($user)) {
-
-                // LƯU SESSION (CHUẨN)
-                $_SESSION['user'] = [
-                    'id'       => $user['id'],
-                    'username' => $user['username'],
-                    'email'    => $user['email'],
-                    'fullname' => $user['fullname'],
-                    'role'     => $user['role']
-                ];
-
-                // CHUYỂN TRANG THEO ROLE
-                switch ($user['role']) {
-                    case 2:
-                        header("Location: index.php?page=admin_dashboard");
-                        break;
-                    case 1:
-                        header("Location: index.php?page=instructor_dashboard");
-                        break;
-                    default:
-                        header("Location: index.php?page=student_dashboard");
-                        break;
-                }
+            if ($user) {
+                $_SESSION['user'] = $user;
+                header("Location:index.php?page=dashboard");
                 exit;
-
-            } else {
-                $error = is_string($user)
-                    ? $user
-                    : "Tên đăng nhập hoặc mật khẩu không đúng!";
-            }
+        } else {
+            $error = "Tên đăng nhập hoặc mật khẩu không đúng!";
         }
+        }
+
 
         require __DIR__ . '/../views/auth/login.php';
     }

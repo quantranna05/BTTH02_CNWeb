@@ -1,34 +1,34 @@
 <?php
-require_once 'models/User.php';
-require_once 'config/auth.php';
+require_once __DIR__ . '/../models/User.php';
 
 class AdminController {
-    private $userModel;
+    private $user;
 
-    public function __construct() {
-        $this->userModel = new User();
+    public function __construct(){
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // 🔴 BẮT BUỘC PHẢI CÓ
+        $this->user = new User();
     }
 
-    public function dashboard() {
-        requireRole(2);
-        require 'views/admin/dashboard.php';
+    public function users(){
+        $users = $this->user->getAll();
+        require __DIR__ . '/../views/admin/users/manage.php';
     }
 
-    public function users() {
-        requireRole(2);
-        $users = $this->userModel->all();
-        require 'views/admin/users/manage.php';
-    }
+    public function updateRole(){
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id   = $_POST['id']   ?? null;
+            $role = $_POST['role'] ?? null;
 
-    public function updateRole() {
-        requireRole(2);
-        $this->userModel->setRole($_POST['id'], $_POST['role']);
-        header("Location: index.php?controller=admin&action=users");
-    }
+            if ($id !== null && $role !== null) {
+                $this->user->updateRole($id, $role);
+            }
+        }
 
-    public function toggleStatus() {
-        requireRole(2);
-        $this->userModel->setStatus($_GET['id'], $_GET['status']);
-        header("Location: index.php?controller=admin&action=users");
+        header("Location: index.php?page=admin_users");
+        exit;
     }
 }

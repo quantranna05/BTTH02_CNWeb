@@ -69,12 +69,13 @@ class User {
        ADMIN: ĐỔI ROLE
        0: Học viên | 1: Giảng viên | 2: Admin
     ========================== */
-    public function updateRole($id, $role) {
+    public function updateRole($id,$role) {
         $stmt = $this->conn->prepare(
             "UPDATE users SET role=? WHERE id=?"
         );
-        return $stmt->execute([$role, $id]);
+        return $stmt->execute([$role,$id]);
     }
+
 
     /* =========================
        ADMIN: KHOÁ / MỞ USER
