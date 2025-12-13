@@ -79,5 +79,22 @@ class EnrollmentController
             header("Location: /BTTH02_CNWeb/onlinecourse/courses/detail/" . $courseId);
         }
     }
+    public function detail($id)
+    {
+
+        $courseModel = new Course();
+        $course = $courseModel->getById($id);
+
+
+        $lessonModel = new Lesson();
+        $lessons = $lessonModel->getByCourseId($id);
+
+        if ($course) {
+
+            require ROOT_PATH . '/views/courses/detail.php';
+        } else {
+            echo "Khóa học không tồn tại!";
+        }
+    }
 }
 ?>

@@ -1,123 +1,172 @@
+/* --- GLOBAL STYLES (Dùng chung cho cả web) --- */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --light-bg: #f4f7f6;
+  --dark-text: #333;
+}
 
-/* GLOBAL STYLES */
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f4f7f6;
+  background-color: var(--light-bg);
   margin: 0;
   padding: 0;
-  color: #333;
+  color: var(--dark-text);
+  line-height: 1.6;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* NAVBAR */
+/* Navbar (Trang chủ) */
 nav {
-  background-color: #ffffff;
+  background: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 15px 0;
   text-align: center;
 }
-
 nav a {
   text-decoration: none;
   color: #333;
   font-weight: 600;
   margin: 0 15px;
-  font-size: 16px;
   transition: color 0.3s;
 }
-
 nav a:hover {
-  color: #007bff;
+  color: var(--primary-color);
 }
 
-/* COURSE GRID */
-.course-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 30px;
-  margin-top: 30px;
+/* --- CSS ĐẶC BIỆT CHO TRANG LOGIN / REGISTER (AUTH) --- */
+
+/* 1. Body của trang Auth: Tạo nền Xanh Gradient và Căn giữa */
+body.auth-body {
+  /* Màu xanh giống Banner trang chủ */
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  min-height: 100vh; /* Chiều cao full màn hình */
+  display: flex; /* Dùng Flexbox */
+  align-items: center; /* Căn giữa dọc */
+  justify-content: center; /* Căn giữa ngang */
+  margin: 0;
 }
 
-.course-item {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s, box-shadow 0.3s;
-  border: none !important; /* Ghi d� style inline cu */
-}
-
-.course-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.course-item img {
+/* 2. Khung chứa Form (Card trắng) */
+.auth-container {
+  background: #ffffff;
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  max-width: 400px; /* Độ rộng vừa đẹp */
+  padding: 40px;
+  border-radius: 15px; /* Bo góc mềm mại */
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); /* Đổ bóng sâu */
+  position: relative;
+  margin: 20px; /* Cách lề mobile */
 }
 
-.course-content {
-  padding: 20px;
+/* Tiêu đề Form */
+.auth-container h2 {
+  text-align: center;
+  color: #007bff;
+  font-weight: 800;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.course-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #2c3e50;
-  height: 54px; /* Gi?i h?n 2 d�ng */
-  overflow: hidden;
-}
-
-.course-price {
-  color: #e74c3c;
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-/* BUTTONS */
-.btn {
-  display: inline-block;
-  padding: 10px 20px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  transition: background 0.3s;
-}
-
-.btn-primary {
-  background: #007bff;
-  color: white;
-}
-.btn-primary:hover {
-  background: #0056b3;
-}
-
-.btn-success {
-  background: #28a745;
-  color: white;
-}
-.btn-success:hover {
-  background: #218838;
-}
-
-/* FORM STYLES */
+/* Ô nhập liệu (Input) */
 .form-group {
   margin-bottom: 20px;
 }
+
+.form-group label {
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+  display: block;
+  font-size: 14px;
+}
+
 .form-control {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 12px 15px;
+  border: 2px solid #e1e1e1;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #00c6ff; /* Viền xanh sáng khi bấm vào */
+  outline: none;
+  background: #f9fcff;
+}
+
+/* Nút bấm (Button) */
+.btn-primary {
+  background: linear-gradient(to right, #007bff, #0056b3);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
   font-size: 16px;
+  width: 100%;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px); /* Hiệu ứng nổi lên */
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+/* Link liên kết dưới cùng */
+.auth-footer {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 14px;
+  color: #666;
+}
+.auth-footer a {
+  color: #007bff;
+  font-weight: bold;
+  text-decoration: none;
+}
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Nút Quay về (Góc trên trái) */
+.back-home {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 15px;
+  border-radius: 30px;
+  backdrop-filter: blur(5px);
+  transition: background 0.3s;
+}
+.back-home:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Thông báo lỗi/thành công */
+.alert {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+.alert-danger {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+.alert-success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
 }

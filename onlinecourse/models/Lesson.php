@@ -2,7 +2,6 @@
 class Lesson
 {
     private $conn;
-    private $table = 'lessons';
 
     public function __construct()
     {
@@ -10,12 +9,11 @@ class Lesson
         $this->conn = $db->getConnection();
     }
 
-    // Lấy danh sách bài học theo ID khóa học
     public function getByCourseId($courseId)
     {
-        // Xóa đoạn "ORDER BY order_num ASC" đi
-        $query = "SELECT * FROM " . $this->table . " WHERE course_id = :course_id";
-        $stmt = $this->conn->prepare($query);
+        // Lấy tất cả bài học thuộc khóa học này
+        $sql = "SELECT * FROM lessons WHERE course_id = :course_id ORDER BY id ASC";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':course_id', $courseId);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
