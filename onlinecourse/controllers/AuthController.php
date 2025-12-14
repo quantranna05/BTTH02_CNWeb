@@ -38,6 +38,8 @@ class AuthController
             $user = $this->user->login($username, $password);
             if ($user) {
                 $_SESSION['user'] = $user;
+                $_SESSION['user_id'] = $user['id'];           // ← DÒNG MỚI 1
+                $_SESSION['username'] = $user['username'];    // ← DÒNG MỚI 2
                 header("Location:index.php?page=student_dashboard");
                 exit;
             } else

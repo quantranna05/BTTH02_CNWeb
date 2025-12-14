@@ -2,9 +2,9 @@
 class Database
 {
     private $host = "localhost";
-    private $db_name = "onlinecourse";
+    private $db_name = "onlinecourse";  
     private $username = "root";
-    private $password = "";
+    private $password = "";          
     public $conn;
 
     public function getConnection()
