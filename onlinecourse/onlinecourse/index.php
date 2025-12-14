@@ -59,7 +59,7 @@ switch ($page) {
     case 'student_dashboard':
         requireRole(0);
         echo "<h2>Student Dashboard</h2>";
-        echo "<p>Xin chào: " . $_SESSION['user']['fullname'] . "</p>";
+        echo "<p>Xin chào: ".$_SESSION['user']['fullname']."</p>";
         echo "<a href='index.php?page=logout'>Logout</a>";
         break;
 
@@ -67,7 +67,7 @@ switch ($page) {
     case 'instructor_dashboard':
         requireRole(1);
         echo "<h2>Instructor Dashboard</h2>";
-        echo "<p>Xin chào: " . $_SESSION['user']['fullname'] . "</p>";
+        echo "<p>Xin chào: ".$_SESSION['user']['fullname']."</p>";
         echo "<a href='index.php?page=logout'>Logout</a>";
         break;
 
@@ -75,7 +75,7 @@ switch ($page) {
     case 'admin_dashboard':
         requireRole(2);
         echo "<h2>Admin Dashboard</h2>";
-        echo "<p>Xin chào ADMIN: " . $_SESSION['user']['fullname'] . "</p>";
+        echo "<p>Xin chào ADMIN: ".$_SESSION['user']['fullname']."</p>";
         echo "<a href='index.php?page=logout'>Logout</a>";
         break;
 

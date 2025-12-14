@@ -1,13 +1,10 @@
 <?php
 require_once __DIR__ . '/../models/User.php';
 
-
-class AuthController
-{
+class AuthController {
     private $user;
 
-    public function __construct()
-    {
+    public function __construct(){
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -17,18 +14,16 @@ class AuthController
     /* =========================
        ĐĂNG KÝ
     ========================== */
-    public function register()
-    {
+    public function register(){
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = trim($_POST['username']);
-            $email = trim($_POST['email']);
+            $email    = trim($_POST['email']);
             $fullname = trim($_POST['fullname']);
             $password = $_POST['password'];
 
             $result = $this->user->register($username, $email, $fullname, $password);
-
 
             if ($result === true) {
                 header("Location: index.php?page=login&success=1");
@@ -44,8 +39,7 @@ class AuthController
     /* =========================
        ĐĂNG NHẬP + PHÂN QUYỀN
     ========================== */
-    public function login()
-    {
+    public function login(){
         $error = '';
 
         if (
@@ -60,9 +54,9 @@ class AuthController
                 $_SESSION['user'] = $user;
                 header("Location:index.php?page=dashboard");
                 exit;
-            } else {
-                $error = "Tên đăng nhập hoặc mật khẩu không đúng!";
-            }
+        } else {
+            $error = "Tên đăng nhập hoặc mật khẩu không đúng!";
+        }
         }
 
 
@@ -72,9 +66,7 @@ class AuthController
     /* =========================
        ĐĂNG XUẤT
     ========================== */
-    public function logout()
-    {
-
+    public function logout(){
         session_destroy();
         header("Location: index.php?page=login");
         exit;

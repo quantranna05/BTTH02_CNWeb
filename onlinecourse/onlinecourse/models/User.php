@@ -1,27 +1,21 @@
 <?php
 require_once __DIR__ . '/../config/Database.php';
 
-class User
-{
+class User {
     private $conn;
 
-
-
-    public function __construct()
-    {
-        $db = new Database();
-        $this->conn = $db->getConnection();
+    public function __construct() {
+        $this->conn = (new Database())->connect();
     }
 
-    public function register($username, $email, $fullname, $password)
-    {
-        $check = $this->conn->prepare("SELECT * FROM users WHERE username=:username OR email=:email");
-        $check->bindParam(':username', $username);
-        $check->bindParam(':email', $email);
-        $check->execute();
-        if ($check->rowCount() > 0)
-            return "Username hoặc Email đã tồn tại!";
-
+    /* =========================
+       ĐĂNG KÝ
+    ========================== */
+    public function register($u, $e, $f, $p) {
+        $check = $this->conn->prepare(
+            "SELECT id FROM users WHERE username=? OR email=?"
+        );
+        $check->execute([$u, $e]);
 
         if ($check->rowCount() > 0) {
             return "User hoặc Email đã tồn tại";
@@ -37,20 +31,17 @@ class User
         return $stmt->execute([$u, $e, $f, $hash]);
     }
 
-
     /* =========================
        ĐĂNG NHẬP
     ========================== */
-    public function login($u, $p)
-    {
+    public function login($u, $p) {
         $stmt = $this->conn->prepare(
             "SELECT * FROM users WHERE username=? LIMIT 1"
         );
         $stmt->execute([$u]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user)
-            return false;
+        if (!$user) return false;
 
         // Tài khoản bị khoá
         if ($user['status'] == 0) {
@@ -67,8 +58,7 @@ class User
     /* =========================
        ADMIN: LẤY DANH SÁCH USER
     ========================== */
-    public function getAll()
-    {
+    public function getAll() {
         return $this->conn->query(
             "SELECT id, username, email, fullname, role, status, created_at 
              FROM users"
@@ -79,20 +69,18 @@ class User
        ADMIN: ĐỔI ROLE
        0: Học viên | 1: Giảng viên | 2: Admin
     ========================== */
-    public function updateRole($id, $role)
-    {
+    public function updateRole($id,$role) {
         $stmt = $this->conn->prepare(
             "UPDATE users SET role=? WHERE id=?"
         );
-        return $stmt->execute([$role, $id]);
+        return $stmt->execute([$role,$id]);
     }
 
 
     /* =========================
        ADMIN: KHOÁ / MỞ USER
     ========================== */
-    public function updateStatus($id, $status)
-    {
+    public function updateStatus($id, $status) {
         $stmt = $this->conn->prepare(
             "UPDATE users SET status=? WHERE id=?"
         );
@@ -102,8 +90,7 @@ class User
     /* =========================
        ADMIN: XOÁ USER
     ========================== */
-    public function delete($id)
-    {
+    public function delete($id) {
         $stmt = $this->conn->prepare(
             "DELETE FROM users WHERE id=?"
         );
@@ -113,15 +100,12 @@ class User
     /* =========================
        TÌM USER THEO ID
     ========================== */
-    public function findById($id)
-    {
+    public function findById($id) {
         $stmt = $this->conn->prepare(
             "SELECT id, username, email, fullname, role, status 
              FROM users WHERE id=?"
         );
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
-
-
     }
 }
