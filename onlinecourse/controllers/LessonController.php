@@ -3,7 +3,7 @@ require_once __DIR__ . '/../models/Lesson.php';
 
 class LessonController
 {
-    // --- HÀM KIỂM TRA QUYỀN (Quan trọng nhất) ---
+
     // Chỉ cho phép Admin (1) HOẶC Giảng viên (2) đi tiếp
     private function checkPermission()
     {

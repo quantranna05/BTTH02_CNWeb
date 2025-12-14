@@ -157,17 +157,39 @@ class CourseController
         if (session_status() === PHP_SESSION_NONE)
             session_start();
 
+        // 1. Kiểm tra đăng nhập
         if (!isset($_SESSION['user_id'])) {
             header("Location: index.php?page=login");
             exit;
         }
 
+        // 2. Kiểm tra vai trò (Giảng viên không cần đăng ký)
         $role = $_SESSION['role'] ?? 0;
         if ($role == 2) {
             echo "<script>alert('Giảng viên không thể đăng ký khóa học!'); window.history.back();</script>";
             exit;
         }
-        // Code đăng ký gọi model...
+
+        // 3. Thực hiện đăng ký
+        $enrollmentModel = new Enrollment();
+        $user_id = $_SESSION['user_id'];
+
+        // Gọi hàm enroll trong Model Enrollment
+        if ($enrollmentModel->enroll($user_id, $course_id)) {
+
+            echo "<script>
+                alert('Đăng ký khóa học thành công! Chúc bạn học tốt.');
+                window.location.href = 'index.php?url=courses/detail/" . $course_id . "';
+            </script>";
+        } else {
+            // Đã đăng ký rồi hoặc lỗi
+            echo "<script>
+                alert('Bạn đã đăng ký khóa học này rồi!');
+                window.location.href = 'index.php?url=courses/detail/" . $course_id . "';
+            </script>";
+        }
     }
 }
+
+
 ?>

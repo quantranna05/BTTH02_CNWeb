@@ -5,54 +5,69 @@ require_once __DIR__ . '/../models/Lesson.php';
 
 class EnrollmentController
 {
-    // Xử lý Đăng ký khóa học
-    public function store()
+    // Hàm hỗ trợ kiểm tra đăng nhập
+    private function requireLogin()
     {
+        if (session_status() === PHP_SESSION_NONE)
+            session_start();
         if (!isset($_SESSION['user_id'])) {
-            header("Location: /BTTH02_CNWeb/onlinecourse/auth/login");
+            header("Location: index.php?page=login");
             exit;
         }
+    }
 
+    // 1. Xử lý Đăng ký khóa học
+    public function store()
+    {
+        $this->requireLogin();
+
+        // Nếu có tham số ID trên URL (dạng GET)
+        // Ví dụ: index.php?url=enrollment/store/5
+        // (Tuy nhiên, ở CourseController ta đã có hàm register rồi, hàm này để dự phòng nếu dùng form POST)
+        if (isset($_GET['course_id'])) {
+            // Logic giống CourseController::register
+            // ...
+        }
+
+        // Nếu dùng Form POST
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $userId = $_SESSION['user_id'];
             $courseId = $_POST['course_id'];
 
             $enrollmentModel = new Enrollment();
-            $enrollmentModel->register($userId, $courseId);
+            // Hàm trong Model là enroll, không phải register
+            $enrollmentModel->enroll($userId, $courseId);
 
             // Đăng ký xong quay lại trang chi tiết
-            header("Location: /BTTH02_CNWeb/onlinecourse/courses/detail/$courseId");
+            header("Location: index.php?url=courses/detail/$courseId");
+            exit;
         }
     }
 
-    // Xử lý khi bấm nút "Hoàn thành bài học" (Tăng %)
+    // 2. Xử lý khi bấm nút "Hoàn thành"
     public function completeLesson()
     {
-        if (!isset($_SESSION['user_id']))
+        if (session_status() === PHP_SESSION_NONE)
+            session_start();
+
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: index.php?page=login");
             exit;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $userId = $_SESSION['user_id'];
-            $courseId = $_POST['course_id'];
+            $courseId = $_POST['course_id']; // Lấy ID khóa học từ form
 
-            // 1. Tính toán % mỗi bài học
-            $lessonModel = new Lesson();
-            $lessons = $lessonModel->getByCourseId($courseId);
-            $totalLessons = count($lessons);
-
-            if ($totalLessons > 0) {
-                $percentPerLesson = 100 / $totalLessons;
-
-                // 2. Lấy tiến độ cũ + % bài mới
+            if ($courseId) {
                 $enrollmentModel = new Enrollment();
-                $currentProgress = $enrollmentModel->getProgress($userId, $courseId);
-                $newProgress = $currentProgress + $percentPerLesson;
-
-                // 3. Cập nhật vào DB
-                $enrollmentModel->updateProgress($userId, $courseId, $newProgress);
+                // Gọi hàm cộng điểm bên Model
+                $enrollmentModel->completeLesson($userId, $courseId);
             }
 
-            header("Location: /BTTH02_CNWeb/onlinecourse/courses/detail/$courseId");
+            // Quay lại trang chi tiết
+            header("Location: index.php?url=courses/detail/$courseId");
+            exit;
         }
     }
 }

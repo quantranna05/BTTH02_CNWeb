@@ -14,7 +14,7 @@ if (file_exists(ROOT_PATH . '/config/auth.php')) {
 require_once ROOT_PATH . '/controllers/AuthController.php';
 
 // ================================================================
-// PHẦN 1: XỬ LÝ ?page=...
+// PHẦN 1: XỬ LÝ ?page=... (Giữ nguyên logic cũ của bạn)
 // ================================================================
 $page = $_GET['page'] ?? null;
 
@@ -40,25 +40,16 @@ if ($page) {
             }
             $role = $_SESSION['role'] ?? 0;
 
-            // Nếu là Admin (1) -> Vào Admin Dashboard
-            if ($role == 1) {
+            if ($role == 1) { // Admin
                 require_once ROOT_PATH . '/views/admin/dashboard.php';
-            }
-            // Nếu là Giảng viên (2) -> Tạm thời cho về trang chủ hoặc Admin Dashboard (vì bạn không dùng Controller riêng)
-            elseif ($role == 2) {
-                // Cách 1: Cho về trang chủ
+            } elseif ($role == 2) { // Giảng viên
                 header("Location: index.php");
-
-                // Cách 2: Nếu muốn dùng chung Dashboard với Admin thì mở dòng dưới:
-                // require_once ROOT_PATH . '/views/admin/dashboard.php';
-            }
-            // Học viên
-            else {
+            } else { // Học viên
                 header("Location: index.php");
             }
             exit;
 
-        // --- ADMIN (Giữ nguyên) ---
+        // --- ADMIN ---
         case 'admin_users':
             if (function_exists('requireRole'))
                 requireRole(1);
@@ -80,9 +71,7 @@ if ($page) {
             (new AdminController())->deleteUser();
             break;
 
-        // --- [QUAN TRỌNG] ĐÃ XÓA CÁC CASE CỦA INSTRUCTOR ĐỂ KHÔNG BÁO LỖI ---
-        // Nếu bạn muốn Giảng viên quản lý khóa học, bạn phải dùng AdminController 
-        // hoặc CourseController để xử lý thay thế tại đây.
+        // --- INSTRUCTOR (Đã xóa để dùng MVC Router) ---
 
         default:
             echo "<h2>404 - Page not found</h2>";
@@ -92,27 +81,42 @@ if ($page) {
 }
 
 // ================================================================
-// PHẦN 2: MVC ROUTER (Courses/Lessons)
+// PHẦN 2: MVC ROUTER (ĐÃ SỬA LỖI TRUYỀN THAM SỐ)
 // ================================================================
 $url = isset($_GET['url']) ? $_GET['url'] : null;
 
 if ($url) {
     $url = rtrim($url, '/');
     $url = explode('/', $url);
+
+    // 1. Lấy tên Controller
     $controllerName = ucfirst($url[0]);
     if (substr($controllerName, -1) == 's') {
         $controllerName = substr($controllerName, 0, -1);
     }
     $controllerName .= 'Controller';
+
+    // 2. Lấy tên Action (Hàm)
     $actionName = isset($url[1]) ? $url[1] : 'index';
+
+    // 3. [MỚI] Lấy Tham số (ID) từ URL
+    // Ví dụ: courses/register/5 -> $params sẽ là 5
+    $params = isset($url[2]) ? $url[2] : null;
+
     $controllerPath = ROOT_PATH . '/controllers/' . $controllerName . '.php';
 
     if (file_exists($controllerPath)) {
         require_once $controllerPath;
         if (class_exists($controllerName)) {
             $controller = new $controllerName();
+
             if (method_exists($controller, $actionName)) {
-                $controller->{$actionName}();
+                // [QUAN TRỌNG] Kiểm tra xem có tham số không để truyền vào hàm
+                if ($params) {
+                    $controller->{$actionName}($params);
+                } else {
+                    $controller->{$actionName}();
+                }
             } else {
                 echo "Action '$actionName' không tồn tại.";
             }
