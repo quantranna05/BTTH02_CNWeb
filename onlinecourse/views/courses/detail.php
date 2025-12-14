@@ -1,168 +1,201 @@
 <?php
-// Gọi Header chuẩn
-include __DIR__ . '/../../views/layouts/header.php';
+// Gọi Header
+include __DIR__ . '/../layouts/header.php';
 
-// Biến kiểm tra Admin
-$isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] == 1);
+// =================================================================================
+// 1. CẤU HÌNH CƠ BẢN & PHÂN QUYỀN
+// =================================================================================
+if (session_status() === PHP_SESSION_NONE)
+    session_start();
+
+// Tính toán đường dẫn gốc (Base URL) để tránh lỗi ảnh/link
+$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+$domainName = $_SERVER['HTTP_HOST'];
+$path = dirname($_SERVER['PHP_SELF']);
+$path = str_replace('\\', '/', $path);
+$path = rtrim($path, '/');
+$base_url = $protocol . $domainName . $path; // VD: http://localhost/BTTH02_CNWeb/onlinecourse
+
+// Lấy Role
+$role = $_SESSION['role'] ?? 0; // 0: Student, 1: Admin, 2: Instructor
+$canManage = ($role == 1 || $role == 2); // Quyền quản lý bài học (Admin + GV)
+$isAdmin = ($role == 1); // Quyền cao nhất (Xóa khóa học)
 ?>
 
-<div class="container" style="margin-top: 40px; margin-bottom: 50px;">
+<div class="container py-5">
+    <div class="row">
 
-    <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 90px; z-index: 1;">
 
-        <div style="flex: 1; min-width: 300px;">
-            <?php
-            $imgName = $course['image'];
-            $imgPath = 'assets/uploads/courses/' . $imgName;
-            if (!empty($imgName) && file_exists(__DIR__ . '/../../' . $imgPath)) {
-                $displayImg = "/BTTH02_CNWeb/onlinecourse/" . $imgPath;
-            } else {
-                $displayImg = "https://via.placeholder.com/600x400.png?text=No+Image";
-            }
-            ?>
-            <img src="<?php echo $displayImg; ?>" alt="<?php echo htmlspecialchars($course['title']); ?>"
-                style="width: 100%; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); object-fit: cover;">
+                <?php
+                $imgName = $course['image'] ?? '';
+                // Thư mục chứa ảnh (Bạn cần đảm bảo ảnh nằm đúng chỗ này)
+                // Nếu bạn lưu ở uploads/ ngay ngoài cùng thì sửa thành 'uploads/'
+                $uploadPath = 'assets/uploads/courses/';
+
+                if (empty($imgName)) {
+                    $displayImg = "https://via.placeholder.com/600x400.png?text=No+Image";
+                } elseif (strpos($imgName, 'http') === 0) {
+                    $displayImg = $imgName; // Link online
+                } else {
+                    // Link file cục bộ (Dùng base_url để nối chuỗi chính xác)
+                    $displayImg = $base_url . '/' . $uploadPath . $imgName;
+                }
+                ?>
+                <img src="<?php echo $displayImg; ?>" class="card-img-top"
+                    alt="<?php echo htmlspecialchars($course['title']); ?>" style="height: 250px; object-fit: cover;"
+                    onerror="this.src='https://via.placeholder.com/600x400.png?text=Image+Error';">
+
+                <div class="card-body p-4">
+                    <h2 class="text-danger fw-bold text-center mb-3">
+                        <?php echo number_format($course['price']); ?> VNĐ
+                    </h2>
+
+                    <?php if ($role == 2): ?>
+                        <div class="alert alert-secondary text-center">
+                            <i class="fas fa-user-tie fa-lg mb-2"></i><br>
+                            <strong>Chế độ Giảng viên</strong><br>
+                            <small>(Bạn có quyền quản lý bài học)</small>
+                        </div>
+
+                    <?php elseif ($role == 1): ?>
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-user-shield fa-lg mb-2"></i><br>
+                            <strong>Chế độ Admin</strong><br>
+                            <small>(Toàn quyền quản trị)</small>
+                        </div>
+                        <a href="<?php echo $base_url; ?>/index.php?url=courses/delete&id=<?php echo $course['id']; ?>"
+                            onclick="return confirm('CẢNH BÁO: Xóa khóa học sẽ xóa toàn bộ bài học và dữ liệu học viên!\nBạn có chắc chắn không?')"
+                            class="btn btn-outline-danger w-100 mt-2">
+                            <i class="fas fa-trash-alt"></i> Xóa khóa học này
+                        </a>
+
+                    <?php elseif (isset($_SESSION['user_id'])): ?>
+                        <?php if (isset($isEnrolled) && $isEnrolled): ?>
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i> Bạn đang học khóa này
+                                <div class="progress mt-2" style="height: 10px;">
+                                    <div class="progress-bar bg-success" role="progressbar"
+                                        style="width: <?php echo $currentProgress; ?>%"></div>
+                                </div>
+                                <small class="text-muted">Tiến độ: <?php echo round($currentProgress); ?>%</small>
+                            </div>
+                        <?php else: ?>
+                            <a href="<?php echo $base_url; ?>/index.php?url=courses/register/<?php echo $course['id']; ?>"
+                                class="btn btn-primary w-100 btn-lg fw-bold shadow-sm"
+                                onclick="return confirm('Xác nhận đăng ký khóa học với giá <?php echo number_format($course['price']); ?>đ?')">
+                                ĐĂNG KÝ HỌC NGAY
+                            </a>
+                        <?php endif; ?>
+
+                    <?php else: ?>
+                        <a href="<?php echo $base_url; ?>/index.php?page=login" class="btn btn-warning w-100 fw-bold">
+                            🔐 Đăng nhập để đăng ký
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
 
-        <div style="flex: 1.5; min-width: 300px;">
+        <div class="col-lg-8">
+            <h1 class="fw-bold text-primary mb-3"><?php echo htmlspecialchars($course['title']); ?></h1>
 
-            <h1 style="color: #333; margin-top: 0; font-size: 28px; line-height: 1.3;">
-                <?php echo htmlspecialchars($course['title']); ?>
-            </h1>
-
-            <?php if ($isAdmin): ?>
-                <div
-                    style="margin-bottom: 20px; padding: 10px; background: #fff3cd; border-left: 5px solid #ffc107; border-radius: 4px; display: inline-block;">
-                    <strong style="margin-right: 10px; color: #856404;">Admin:</strong>
-
-                    <a href="/BTTH02_CNWeb/onlinecourse/courses/delete?id=<?php echo $course['id']; ?>"
-                        onclick="return confirm('CẢNH BÁO: Bạn có chắc muốn xóa khóa học này?\n\nTất cả BÀI HỌC và DỮ LIỆU ĐĂNG KÝ của sinh viên thuộc khóa này sẽ bị xóa vĩnh viễn!')"
-                        style="color: #dc3545; text-decoration: none; font-weight: bold; font-size: 14px;">
-                        <i class="fas fa-trash"></i> Xóa khóa này
-                    </a>
-                </div>
-            <?php endif; ?>
-
-            <p style="font-size: 24px; color: #dc3545; font-weight: bold; margin: 15px 0;">
-                Giá: <?php echo number_format($course['price']); ?> VNĐ
-            </p>
-
-            <div style="margin-bottom: 25px; color: #555; line-height: 1.6; white-space: pre-line;">
-                <?php echo htmlspecialchars($course['description']); ?>
+            <div class="bg-light p-4 rounded mb-5">
+                <h5 class="fw-bold border-bottom pb-2">Giới thiệu khóa học</h5>
+                <p class="mb-0" style="white-space: pre-line; color: #555;">
+                    <?php echo htmlspecialchars($course['description']); ?>
+                </p>
             </div>
 
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef;">
-                <?php if ($isAdmin): ?>
-                    <h4 style="margin: 0; color: #007bff;"><i class="fas fa-user-shield"></i> Chế độ xem của Admin</h4>
-                    <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">Bạn có toàn quyền thêm/sửa/xóa nội dung bài
-                        học.</p>
-                <?php elseif (isset($_SESSION['user_id'])): ?>
-                    <?php if (isset($isEnrolled) && $isEnrolled): ?>
-                        <h4 style="margin-top: 0; color: #28a745;"><i class="fas fa-check-circle"></i> Bạn đang học khóa này
-                        </h4>
-                        <div style="margin-top: 15px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <strong>Tiến độ:</strong><strong
-                                    style="color: #28a745;"><?php echo round($currentProgress); ?>%</strong>
-                            </div>
-                            <div style="width: 100%; background: #ddd; height: 10px; border-radius: 5px;">
-                                <div style="width: <?php echo $currentProgress; ?>%; background: #28a745; height: 100%;"></div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0"><i class="fas fa-list-ul me-2"></i>Nội dung bài học</h4>
+
+                <?php if ($canManage): ?>
+                    <a href="<?php echo $base_url; ?>/index.php?url=lessons/create&course_id=<?php echo $course['id']; ?>"
+                        class="btn btn-success btn-sm shadow-sm">
+                        <i class="fas fa-plus"></i> Thêm bài mới
+                    </a>
+                <?php endif; ?>
+            </div>
+
+            <div class="list-group">
+                <?php if (!empty($lessons)): ?>
+                    <?php
+                    $totalLessons = count($lessons);
+                    $percentPerLesson = ($totalLessons > 0) ? (100 / $totalLessons) : 0;
+                    ?>
+
+                    <?php foreach ($lessons as $index => $lesson): ?>
+                        <div class="list-group-item list-group-item-action p-3 mb-2 border rounded shadow-sm">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-primary rounded-circle me-3"
+                                        style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                                        <?php echo $index + 1; ?>
+                                    </span>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold"><?php echo htmlspecialchars($lesson['title']); ?></h6>
+
+                                        <?php if (!empty($lesson['video_url'])): ?>
+                                            <?php if ($canManage || (isset($isEnrolled) && $isEnrolled)): ?>
+                                                <a href="<?php echo htmlspecialchars($lesson['video_url']); ?>" target="_blank"
+                                                    class="text-danger text-decoration-none small">
+                                                    <i class="fab fa-youtube"></i> Xem Video bài giảng
+                                                </a>
+                                            <?php else: ?>
+                                                <small class="text-muted"><i class="fas fa-lock"></i> Đăng ký để xem video</small>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <?php if ($canManage): ?>
+                                        <div class="btn-group" role="group">
+                                            <a href="<?php echo $base_url; ?>/index.php?url=lessons/edit&id=<?php echo $lesson['id']; ?>&course_id=<?php echo $course['id']; ?>"
+                                                class="btn btn-outline-warning btn-sm" title="Sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="<?php echo $base_url; ?>/index.php?url=lessons/delete&id=<?php echo $lesson['id']; ?>&course_id=<?php echo $course['id']; ?>"
+                                                class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm('Bạn chắc chắn muốn xóa bài học này?')" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+
+                                    <?php elseif (isset($isEnrolled) && $isEnrolled): ?>
+                                        <?php $threshold = ($index + 1) * $percentPerLesson; ?>
+
+                                        <?php if ($currentProgress >= ($threshold - 0.1)): ?>
+                                            <button class="btn btn-success btn-sm disabled" style="opacity: 0.8;">
+                                                <i class="fas fa-check"></i> Xong
+                                            </button>
+                                        <?php else: ?>
+                                            <form action="<?php echo $base_url; ?>/index.php?url=enrollment/completeLesson"
+                                                method="POST" class="d-inline">
+                                                <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+                                                <button type="submit" class="btn btn-outline-success btn-sm">
+                                                    Hoàn thành
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                </div>
+
                             </div>
                         </div>
-                    <?php else: ?>
-                        <form action="/BTTH02_CNWeb/onlinecourse/enrollment/store" method="POST">
-                            <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                            <button type="submit" onclick="return confirm('Bạn muốn đăng ký khóa học này?')"
-                                style="background: #007bff; color: white; padding: 15px; border: none; border-radius: 5px; font-weight: bold; width: 100%; cursor: pointer;">
-                                ĐĂNG KÝ HỌC NGAY
-                            </button>
-                        </form>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
                 <?php else: ?>
-                    <a href="/BTTH02_CNWeb/onlinecourse/auth/login"
-                        style="display: block; text-align: center; background: #ffc107; color: #000; padding: 15px; border-radius: 5px; font-weight: bold; text-decoration: none;">🔐
-                        Đăng nhập để học</a>
+                    <div class="text-center p-5 bg-light rounded text-muted">
+                        <i class="fas fa-box-open fa-3x mb-3"></i>
+                        <p>Chưa có bài học nào được cập nhật.</p>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
     </div>
-
-    <hr style="margin: 40px 0; border-top: 1px solid #eee;">
-
-    <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="color: #007bff; border-left: 5px solid #007bff; padding-left: 15px;">Nội dung khóa học</h3>
-
-            <?php if ($isAdmin): ?>
-                <a href="/BTTH02_CNWeb/onlinecourse/lessons/create?course_id=<?php echo $course['id']; ?>"
-                    style="background: #28a745; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-weight: bold;">
-                    <i class="fas fa-plus"></i> Thêm bài học
-                </a>
-            <?php endif; ?>
-        </div>
-
-        <ul style="list-style: none; padding: 0;">
-            <?php if (!empty($lessons)): ?>
-                <?php
-                $totalLessons = count($lessons);
-                $percentPerLesson = ($totalLessons > 0) ? (100 / $totalLessons) : 0;
-                ?>
-                <?php foreach ($lessons as $index => $lesson): ?>
-                    <li
-                        style="background: #fff; border: 1px solid #e9ecef; padding: 20px; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <span
-                                style="background: #007bff; color: #fff; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold;">
-                                <?php echo $index + 1; ?>
-                            </span>
-                            <div>
-                                <strong style="font-size: 16px;"><?php echo htmlspecialchars($lesson['title']); ?></strong>
-                                <?php if (!empty($lesson['video_url'])): ?>
-                                    <?php if ($isAdmin || (isset($isEnrolled) && $isEnrolled)): ?>
-                                        <br><a href="<?php echo htmlspecialchars($lesson['video_url']); ?>" target="_blank"
-                                            style="color: #d9534f; font-size: 13px; text-decoration: none; margin-top: 5px; display: inline-block;"><i
-                                                class="fab fa-youtube"></i> Xem video</a>
-                                    <?php else: ?>
-                                        <br><span style="color: #999; font-size: 12px;">🔒 Đăng ký để xem video</span>
-                                    <?php endif; ?>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <?php if ($isAdmin): ?>
-                                <a href="/BTTH02_CNWeb/onlinecourse/lessons/edit?id=<?php echo $lesson['id']; ?>&course_id=<?php echo $course['id']; ?>"
-                                    style="color: #ffc107; font-weight: bold; text-decoration: none; border: 1px solid #ffc107; padding: 5px 10px; border-radius: 4px; font-size: 13px;">
-                                    Sửa
-                                </a>
-                                <a href="/BTTH02_CNWeb/onlinecourse/lessons/delete?id=<?php echo $lesson['id']; ?>&course_id=<?php echo $course['id']; ?>"
-                                    onclick="return confirm('Xóa bài này?')"
-                                    style="color: #dc3545; font-weight: bold; text-decoration: none; border: 1px solid #dc3545; padding: 5px 10px; border-radius: 4px; font-size: 13px;">
-                                    Xóa
-                                </a>
-                            <?php elseif (isset($isEnrolled) && $isEnrolled): ?>
-                                <?php $threshold = ($index + 1) * $percentPerLesson; ?>
-                                <?php if ($currentProgress >= ($threshold - 0.1)): ?>
-                                    <button disabled
-                                        style="border: 1px solid #28a745; background: #28a745; color: white; padding: 6px 12px; border-radius: 4px; opacity: 0.8; cursor: not-allowed;">✅
-                                        Đã xong</button>
-                                <?php else: ?>
-                                    <form action="/BTTH02_CNWeb/onlinecourse/enrollment/completeLesson" method="POST"
-                                        style="margin: 0;">
-                                        <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                        <button type="submit"
-                                            style="border: 1px solid #28a745; background: white; color: #28a745; padding: 6px 12px; border-radius: 4px; cursor: pointer;">✔
-                                            Hoàn thành</button>
-                                    </form>
-                                <?php endif; ?>
-                            <?php endif; ?>
-                        </div>
-                    </li>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </ul>
-    </div>
 </div>
 
-<?php include __DIR__ . '/../../views/layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/footer.php'; ?>

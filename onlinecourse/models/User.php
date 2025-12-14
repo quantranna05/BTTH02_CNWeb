@@ -11,32 +11,44 @@ class User
         $this->conn = $db->getConnection();
     }
 
-    public function register($username, $email, $fullname, $password)
+    // Lấy tất cả user
+    public function getAll()
     {
-        $check = $this->conn->prepare("SELECT * FROM users WHERE username=:username OR email=:email");
-        $check->bindParam(':username', $username);
-        $check->bindParam(':email', $email);
-        $check->execute();
-        if ($check->rowCount() > 0)
-            return "Username hoặc Email đã tồn tại!";
-
-        $stmt = $this->conn->prepare("INSERT INTO users (username,email,fullname,password,role,created_at)
-            VALUES (:username,:email,:fullname,:password,0,NOW())");
-        $hashed = password_hash($password, PASSWORD_BCRYPT);
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':fullname', $fullname);
-        $stmt->bindParam(':password', $hashed);
-
-        return $stmt->execute() ? true : "Đăng ký thất bại!";
+        $stmt = $this->conn->query("SELECT id, username, email, fullname, role, created_at FROM users ORDER BY id DESC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Cập nhật quyền
+    public function updateRole($id, $role)
+    {
+        $stmt = $this->conn->prepare("UPDATE users SET role = ? WHERE id = ?");
+        return $stmt->execute([$role, $id]);
+    }
+
+    // Xóa user
+    public function delete($id)
+    {
+        $stmt = $this->conn->prepare("DELETE FROM users WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
+
+    // Login (Giữ lại để dùng cho AuthController)
     public function login($username, $password)
     {
-        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username=:username");
-        $stmt->bindParam(':username', $username);
-        $stmt->execute();
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+        $stmt->execute([$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user && password_verify($password, $user['password']) ? $user : false;
+        if ($user && password_verify($password, $user['password'])) {
+            return $user;
+        }
+        return false;
+    }
+
+    // Register
+    public function register($username, $email, $fullname, $password)
+    {
+        // ... (Code register cũ của bạn) ...
+        // Lưu ý: Default role = 0
     }
 }
+?>

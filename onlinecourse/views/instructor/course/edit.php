@@ -2,7 +2,6 @@
 
 <div class="container"
     style="display: flex; justify-content: center; align-items: center; padding: 40px 20px; min-height: 85vh;">
-
     <div class="auth-container"
         style="width: 100%; max-width: 700px; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
 
@@ -11,7 +10,7 @@
             <i class="fas fa-edit"></i> Cập nhật Khóa học
         </h2>
 
-        <form action="/BTTH02_CNWeb/onlinecourse/courses/update" method="POST" enctype="multipart/form-data">
+        <form action="index.php?url=courses/update" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
             <input type="hidden" name="old_image" value="<?php echo $course['image']; ?>">
 
@@ -39,11 +38,10 @@
 
                 <div
                     style="display: flex; gap: 20px; align-items: flex-start; border: 2px dashed #ddd; padding: 15px; border-radius: 8px; background: #f9f9f9;">
-
                     <div style="text-align: center;">
                         <span style="font-size: 12px; color: #666; display: block; margin-bottom: 5px;">Ảnh hiện
                             tại</span>
-                        <img src="/BTTH02_CNWeb/onlinecourse/assets/uploads/courses/<?php echo $course['image']; ?>"
+                        <img src="assets/uploads/courses/<?php echo $course['image']; ?>"
                             style="width: 120px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
                     </div>
 
@@ -53,8 +51,7 @@
                         <input type="file" name="image" id="imgInput" class="form-control" style="width: 100%;">
 
                         <div id="previewContainer" style="display: none; margin-top: 10px;">
-                            <span style="font-size: 12px; color: #28a745; font-weight: bold;">Ảnh mới sẽ thay
-                                thế:</span><br>
+                            <span style="font-size: 12px; color: #28a745; font-weight: bold;">Ảnh mới:</span><br>
                             <img id="preview" src="#"
                                 style="max-width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-top: 5px; border: 1px solid #28a745;">
                         </div>
@@ -69,13 +66,11 @@
                 </button>
 
                 <div style="margin-top: 20px;">
-                    <a href="/BTTH02_CNWeb/onlinecourse/courses"
-                        style="color: #666; text-decoration: none; font-size: 14px;">
+                    <a href="index.php?url=courses" style="color: #666; text-decoration: none; font-size: 14px;">
                         <i class="fas fa-arrow-left"></i> Hủy bỏ
                     </a>
                 </div>
             </div>
-
         </form>
     </div>
 </div>

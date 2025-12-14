@@ -1,76 +1,82 @@
-<?php include ROOT_PATH . '/views/layouts/header.php'; ?>
+<?php
+// Include Header
+include __DIR__ . '/../layouts/header.php';
+?>
 
-<div
-    style="background: linear-gradient(to right, #4facfe, #00f2fe); padding: 60px 20px; text-align: center; color: white;">
-    <h1>Chào mừng đến với Online Course</h1>
-    <p style="font-size: 18px; margin-bottom: 30px;">Tìm kiếm khóa học và bắt đầu sự nghiệp của bạn</p>
-
-    <form action="/BTTH02_CNWeb/onlinecourse/courses" method="GET"
-        style="display: inline-block; width: 100%; max-width: 500px;">
-        <div style="display: flex; background: white; padding: 5px; border-radius: 50px;">
-            <input type="text" name="keyword" placeholder="Bạn muốn học gì?"
-                style="flex: 1; border: none; padding: 10px 20px; border-radius: 50px; outline: none;">
-            <button type="submit"
-                style="background: #007bff; color: white; border: none; padding: 10px 30px; border-radius: 50px; font-weight: bold; cursor: pointer;">Tìm</button>
-        </div>
-    </form>
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4 text-white">Khởi đầu sự nghiệp lập trình</h1>
+        <p class="lead mb-5 text-white opacity-75">Học từ cơ bản đến nâng cao với lộ trình rõ ràng.</p>
+        <a href="<?php echo $base_url; ?>/index.php?url=courses"
+            class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow">
+            Xem tất cả khóa học
+        </a>
+    </div>
 </div>
 
-<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 20px;">
-    <h2 style="text-align: center; margin-bottom: 30px; color: #333;">Khóa học nổi bật</h2>
+<div class="container mb-5">
+    <div class="row text-center g-4">
+        <div class="col-md-4">
+            <div class="p-4 border rounded-3 shadow-sm h-100 bg-white">
+                <i class="fas fa-laptop-code fa-3x text-primary mb-3"></i>
+                <h5>Học thực chiến</h5>
+                <p class="text-muted">Bài tập thực hành chiếm 70% thời lượng.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 border rounded-3 shadow-sm h-100 bg-white">
+                <i class="fas fa-certificate fa-3x text-success mb-3"></i>
+                <h5>Cấp chứng chỉ</h5>
+                <p class="text-muted">Chứng nhận hoàn thành có giá trị toàn quốc.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 border rounded-3 shadow-sm h-100 bg-white">
+                <i class="fas fa-infinity fa-3x text-warning mb-3"></i>
+                <h5>Truy cập trọn đời</h5>
+                <p class="text-muted">Mua một lần, học mãi mãi, update miễn phí.</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <div class="course-list"
-        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
-        <?php if (!empty($courses)): ?>
-            <?php foreach (array_slice($courses, 0, 6) as $course): ?>
+<div class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold">Khóa học nổi bật</h2>
+        <div class="row">
+            <?php
+            // Chỉ lấy 3 khóa học
+            $topCourses = !empty($courses) ? array_slice($courses, 0, 3) : [];
 
-                <div class="course-item"
-                    onclick="window.location.href='/BTTH02_CNWeb/onlinecourse/courses/detail/<?php echo $course['id']; ?>'"
-                    style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; user-select: none; transition: transform 0.2s;">
-
-                    <?php
-                    $imgName = $course['image'];
-                    $imgPath = 'assets/uploads/courses/' . $imgName;
-                    if (empty($imgName) || !file_exists(ROOT_PATH . '/' . $imgPath)) {
-                        $displayImg = "https://via.placeholder.com/400x225.png?text=Featured+Course";
+            if (empty($topCourses)): ?>
+                <div class="text-center text-muted">Chưa có khóa học nào.</div>
+            <?php else:
+                foreach ($topCourses as $course):
+                    // Xử lý ảnh
+                    $imgName = $course['image'] ?? '';
+                    if (empty($imgName)) {
+                        $imgSrc = "https://via.placeholder.com/600x400.png?text=Course";
+                    } elseif (strpos($imgName, 'http') === 0) {
+                        $imgSrc = $imgName;
                     } else {
-                        $displayImg = "/BTTH02_CNWeb/onlinecourse/" . $imgPath;
+                        $imgSrc = $base_url . '/assets/uploads/courses/' . $imgName;
                     }
                     ?>
-                    <img src="<?php echo $displayImg; ?>" alt="<?php echo $course['title']; ?>"
-                        style="width: 100%; height: 180px; object-fit: cover;">
-
-                    <div style="padding: 15px;">
-                        <h3
-                            style="margin: 0 0 10px; font-size: 18px; min-height: 44px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
-                            <?php echo $course['title']; ?>
-                        </h3>
-                        <p style="color: #d9534f; font-weight: bold; margin: 0; font-size: 16px;">
-                            <?php echo number_format($course['price']); ?> VNĐ
-                        </p>
-
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 border-0 shadow-sm course-card">
+                            <img src="<?php echo $imgSrc; ?>" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold text-truncate"><?php echo htmlspecialchars($course['title']); ?>
+                                </h5>
+                                <p class="card-text text-danger fw-bold"><?php echo number_format($course['price']); ?> VNĐ</p>
+                                <a href="<?php echo $base_url; ?>/index.php?url=courses/detail/<?php echo $course['id']; ?>"
+                                    class="btn btn-outline-primary w-100">Xem chi tiết</a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p style="text-align: center; width: 100%;">Chưa có dữ liệu khóa học.</p>
-        <?php endif; ?>
-    </div>
-
-    <div style="text-align: center; margin-top: 40px;">
-        <a href="/BTTH02_CNWeb/onlinecourse/courses"
-            style="padding: 12px 30px; background: #333; color: white; text-decoration: none; border-radius: 30px; font-weight: bold;">Xem
-            tất cả khóa học</a>
+                <?php endforeach; endif; ?>
+        </div>
     </div>
 </div>
 
-<style>
-    .course-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
-        border-color: #007bff !important;
-    }
-</style>
-
-<?php include ROOT_PATH . '/views/layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/footer.php'; ?>

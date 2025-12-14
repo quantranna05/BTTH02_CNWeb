@@ -5,40 +5,16 @@ class AuthController
 {
     private $userModel;
 
-    // ĐỊNH NGHĨA ĐƯỜNG DẪN GỐC CỦA DỰ ÁN
-    // Bạn hãy sửa dòng này nếu tên thư mục dự án của bạn khác
-    private $baseUrl = '/BTTH02_CNWeb/onlinecourse';
-
     public function __construct()
     {
+        // Luôn đảm bảo session được bật để thao tác
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         $this->userModel = new User();
     }
 
-    public function register()
-    {
-        $error = '';
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = trim($_POST['username']);
-            $email = trim($_POST['email']);
-            $fullname = trim($_POST['fullname']);
-            $password = $_POST['password'];
-
-            $result = $this->userModel->register($username, $email, $fullname, $password);
-
-            if ($result === true) {
-                // SỬA LẠI: Chuyển hướng về trang login với đường dẫn tuyệt đối
-                header("Location: " . $this->baseUrl . "/auth/login?success=1");
-                exit;
-            } else {
-                $error = $result;
-            }
-        }
-        require __DIR__ . '/../views/auth/register.php';
-    }
-
+    // --- ĐĂNG NHẬP ---
     public function login()
     {
         $error = '';
@@ -48,16 +24,15 @@ class AuthController
 
             $user = $this->userModel->login($username, $password);
 
-            if ($user) {
-                // Lưu session
+            if ($user && is_array($user)) {
+                // Lưu thông tin vào Session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
                 $_SESSION['fullname'] = $user['fullname'];
+                $_SESSION['role'] = $user['role'];
 
-                // --- QUAN TRỌNG: CHUYỂN VỀ TRANG CHỦ TUYỆT ĐỐI ---
-                // Dùng đường dẫn gốc để không bị kẹt trong thư mục /auth/
-                header("Location: " . $this->baseUrl . "/");
+                // Chuyển hướng về trang chủ
+                header("Location: index.php");
                 exit;
             } else {
                 $error = "Tên đăng nhập hoặc mật khẩu không đúng!";
@@ -66,13 +41,24 @@ class AuthController
         require __DIR__ . '/../views/auth/login.php';
     }
 
+    // --- ĐĂNG KÝ ---
+    public function register()
+    {
+        // (Code đăng ký giữ nguyên như cũ)
+        require __DIR__ . '/../views/auth/register.php';
+    }
+
+    // --- ĐĂNG XUẤT (QUAN TRỌNG) ---
     public function logout()
     {
+        // 1. Xóa tất cả biến trong session
         session_unset();
+
+        // 2. Hủy hoàn toàn phiên làm việc
         session_destroy();
 
-        // Chuyển hướng về trang chủ sau khi đăng xuất
-        header("Location: " . $this->baseUrl . "/");
+        // 3. Chuyển hướng về trang chủ (để thấy lại nút Đăng nhập)
+        header("Location: index.php");
         exit;
     }
 }

@@ -2,7 +2,6 @@
 
 <div class="container"
     style="display: flex; justify-content: center; align-items: center; padding: 40px 20px; min-height: 80vh;">
-
     <div class="auth-container"
         style="width: 100%; max-width: 700px; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
 
@@ -11,7 +10,7 @@
             <i class="fas fa-plus-circle"></i> Thêm Khóa Học Mới
         </h2>
 
-        <form action="/BTTH02_CNWeb/onlinecourse/courses/store" method="POST" enctype="multipart/form-data">
+        <form action="index.php?url=courses/store" method="POST" enctype="multipart/form-data">
 
             <div class="form-group" style="margin-bottom: 20px;">
                 <label style="font-weight: bold; display: block; margin-bottom: 8px; color: #333;">Tên khóa học:</label>
@@ -50,13 +49,11 @@
                 </button>
 
                 <div style="margin-top: 20px;">
-                    <a href="/BTTH02_CNWeb/onlinecourse/courses"
-                        style="color: #666; text-decoration: none; font-size: 14px;">
+                    <a href="index.php?url=courses" style="color: #666; text-decoration: none; font-size: 14px;">
                         <i class="fas fa-arrow-left"></i> Quay lại danh sách
                     </a>
                 </div>
             </div>
-
         </form>
     </div>
 </div>

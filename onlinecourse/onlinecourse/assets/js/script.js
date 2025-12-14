@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 document.addEventListener("DOMContentLoaded", function () {
   const sidebarToggle = document.getElementById("sidebar-toggle");
   const sidebar = document.querySelector(".sidebar");
@@ -68,4 +69,9 @@ document.addEventListener("DOMContentLoaded", function () {
       false
     );
   });
+=======
+document.addEventListener('DOMContentLoaded',function(){
+    const alerts=document.querySelectorAll('.alert');
+    alerts.forEach(a=>setTimeout(()=>a.style.display='none',3000));
+>>>>>>> feature/auth
 });
