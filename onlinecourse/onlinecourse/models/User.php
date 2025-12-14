@@ -1,11 +1,9 @@
 <?php
 require_once __DIR__ . '/../config/Database.php';
 
-class User
-{
+class User {
     private $conn;
 
-<<<<<<< HEAD:onlinecourse/onlinecourse/models/User.php
     public function __construct() {
         $this->conn = (new Database())->connect();
     }
@@ -18,22 +16,6 @@ class User
             "SELECT id FROM users WHERE username=? OR email=?"
         );
         $check->execute([$u, $e]);
-=======
-    public function __construct()
-    {
-        $db = new Database();
-        $this->conn = $db->getConnection();
-    }
-
-    public function register($username, $email, $fullname, $password)
-    {
-        $check = $this->conn->prepare("SELECT * FROM users WHERE username=:username OR email=:email");
-        $check->bindParam(':username', $username);
-        $check->bindParam(':email', $email);
-        $check->execute();
-        if ($check->rowCount() > 0)
-            return "Username hoặc Email đã tồn tại!";
->>>>>>> 16dc027df1d69c70b35a69d99407b7053e566f89:onlinecourse/models/User.php
 
         if ($check->rowCount() > 0) {
             return "User hoặc Email đã tồn tại";
@@ -49,7 +31,6 @@ class User
         return $stmt->execute([$u, $e, $f, $hash]);
     }
 
-<<<<<<< HEAD:onlinecourse/onlinecourse/models/User.php
     /* =========================
        ĐĂNG NHẬP
     ========================== */
@@ -126,14 +107,5 @@ class User
         );
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
-=======
-    public function login($username, $password)
-    {
-        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username=:username");
-        $stmt->bindParam(':username', $username);
-        $stmt->execute();
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user && password_verify($password, $user['password']) ? $user : false;
->>>>>>> 16dc027df1d69c70b35a69d99407b7053e566f89:onlinecourse/models/User.php
     }
 }

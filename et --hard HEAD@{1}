@@ -1,0 +1,11 @@
+[33mc6ed392[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/auth[m[33m)[m HEAD@{0}: commit: Cập nhật chức năng
+[33m72819a9[m HEAD@{1}: commit: Thêm chức năng quản lý tài khoản người dùng, phân quyền
+[33ma5098e8[m HEAD@{2}: commit: Sửa lại giao diện lần 3
+[33m32a3298[m HEAD@{3}: commit: Sửa giao diện lần 2
+[33m800103d[m HEAD@{4}: commit: Sửa giao diện login và style
+[33m14925fd[m HEAD@{5}: commit: đăng nhập,đăng ký
+[33m3ed00d0[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/feature/ui-upload[m[33m, [m[1;31morigin/feature/instructor-course[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeature/ui-upload[m[33m)[m HEAD@{6}: checkout: moving from feature/auth to feature/auth
+[33m3ed00d0[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/feature/ui-upload[m[33m, [m[1;31morigin/feature/instructor-course[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeature/ui-upload[m[33m)[m HEAD@{7}: checkout: moving from feature/ui-upload to feature/auth
+[33m3ed00d0[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/feature/ui-upload[m[33m, [m[1;31morigin/feature/instructor-course[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeature/ui-upload[m[33m)[m HEAD@{8}: checkout: moving from feature/auth to feature/ui-upload
+[33m3ed00d0[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/feature/ui-upload[m[33m, [m[1;31morigin/feature/instructor-course[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeature/ui-upload[m[33m)[m HEAD@{9}: checkout: moving from main to feature/auth
+[33m3ed00d0[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/feature/ui-upload[m[33m, [m[1;31morigin/feature/instructor-course[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeature/ui-upload[m[33m)[m HEAD@{10}: clone: from https://github.com/CaoDucDao/BTTH02_CNWeb.git
